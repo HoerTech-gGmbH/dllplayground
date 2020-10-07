@@ -14,14 +14,30 @@ cfg_t::cfg_t(const double srate, const double fragsize, const double bandwidth,
 #define checkassignclocksource(whichclock)                                     \
   if(clock_source_name == #whichclock)                                         \
     clock_source = whichclock;
+#ifdef CLOCK_REALTIME
   checkassignclocksource(CLOCK_REALTIME);
+#endif
+#ifdef CLOCK_REALTIME_COARSE
   checkassignclocksource(CLOCK_REALTIME_COARSE);
+#endif
+#ifdef CLOCK_MONOTONIC
   checkassignclocksource(CLOCK_MONOTONIC);
+#endif
+#ifdef CLOCK_MONOTONIC_COARSE
   checkassignclocksource(CLOCK_MONOTONIC_COARSE);
+#endif
+#ifdef CLOCK_MONOTONIC_RAW
   checkassignclocksource(CLOCK_MONOTONIC_RAW);
+#endif
+#ifdef CLOCK_BOOTTIME
   checkassignclocksource(CLOCK_BOOTTIME);
+#endif
+#ifdef CLOCK_PROCESS_CPUTIME_ID
   checkassignclocksource(CLOCK_PROCESS_CPUTIME_ID);
+#endif
+#ifdef CLOCK_THREAD_CPUTIME_ID
   checkassignclocksource(CLOCK_THREAD_CPUTIME_ID);
+#endif
 }
 
 std::pair<double, double> cfg_t::process()
