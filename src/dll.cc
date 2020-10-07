@@ -3,6 +3,10 @@
 #include <cmath>
 #include <limits>
 
+#ifndef M_PI
+#define M_PI 3.141592653589793115997963468544185161591
+#endif
+
 cfg_t::cfg_t(const double srate, const double fragsize, const double bandwidth,
                   const std::string& clock_source_name, const double adjustment)
     : F(srate / fragsize),
