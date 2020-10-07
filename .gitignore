@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# emacs backup:
+*~
+
+# build directory:
+build
