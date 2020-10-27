@@ -67,4 +67,16 @@ clangformat:
 	clang-format-9 -i $(wildcard src/*.cc) $(wildcard src/*.h)
 
 clean:
-	rm -Rf build src/*~
+	rm -Rf build src/*~ googletest
+
+googletest: googletest/include/gmock/gmock.h googletest/lib/libgmock_main.a
+
+googletest/include/gmock/gmock.h googletest/lib/libgmock_main.a: googletest/build/Makefile
+	$(MAKE) -C googletest/build VERBOSE=1 install
+
+googletest/build/Makefile: googletest/CMakeLists.txt
+	mkdir -p googletest/build
+	cd googletest/build && cmake -DCMAKE_INSTALL_PREFIX=.. ..
+
+googletest/CMakeLists.txt:
+	git clone git@github.com:google/googletest || git clone https://github.com/google/googletest
