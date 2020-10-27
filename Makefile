@@ -1,4 +1,4 @@
-all: build lib
+all: lib
 
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++11 -pthread	\
 -ggdb -fno-finite-math-only
@@ -56,13 +56,11 @@ lib: build/libdll.a
 build/libdll.a: $(BUILD_OBJ)
 	ar rcs $@ $^
 
-build: build/.directory
-
 %/.directory:
 	mkdir -p $*
 	touch $@
 
-build/%.o: src/%.cc $(wildcard src/*.h)
+build/%.o: src/%.cc $(wildcard src/*.h) build/.directory
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clangformat:
