@@ -1,6 +1,6 @@
 all: lib
 
-CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++11 -pthread	\
+CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++17 -pthread	\
 -ggdb -fno-finite-math-only
 
 OSFLAG :=
@@ -47,7 +47,7 @@ ifeq "$(ARCH)" "x86_64"
 CXXFLAGS += -msse -msse2 -mfpmath=sse -ffast-math
 endif
 
-CPPFLAGS = -std=c++11
+CPPFLAGS = -std=c++17
 BUILD_DIR = build
 SOURCE_DIR = src
 
