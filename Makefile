@@ -8,6 +8,7 @@ INCLUDEPATH = -I$(SOURCE_DIR) -Igoogletest/include
 OSFLAG :=
 ifeq ($(OS),Windows_NT)
 	OSFLAG += -D WIN32
+	CMAKEFLAGS += -G"MSYS Makefiles"
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		OSFLAG += -D AMD64
 	endif
@@ -95,7 +96,7 @@ googletest/include/gmock/gmock.h googletest/lib/libgmock_main.a: googletest/buil
 
 googletest/build/Makefile: googletest/CMakeLists.txt
 	mkdir -p googletest/build
-	cd googletest/build && cmake -DCMAKE_INSTALL_PREFIX=.. ..
+	cd googletest/build && cmake -DCMAKE_INSTALL_PREFIX=.. $(CMAKEFLAGS) ..
 
 googletest/CMakeLists.txt:
 	git clone git@github.com:google/googletest || git clone https://github.com/google/googletest
