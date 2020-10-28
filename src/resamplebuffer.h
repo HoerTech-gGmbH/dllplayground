@@ -1,6 +1,13 @@
 #ifndef RESAMPLEBUFFER_H
 #define RESAMPLEBUFFER_H
 
+#include <stddef.h> // for size_t
+#include <chrono>
+
+// preliminary type definitions
+struct dll_cfg_t{};
+struct resampler_cfg_t{};
+
 /**
   Class for adaptive resampling and buffering.  This class will receive incoming
   sound samples received from the network, and provide adaptively resampled
@@ -62,8 +69,9 @@ public:
   ///                    is filtered by a delay-locked loop before it is used by
   ///                    the resampler.  Together with block_index, arrivaltime is
   ///                    used to detect dropouts on the sender's side heuristically
+  template <class Clock>
   void write(size_t block_index, const float* samples,
-             const std::chrono::time_point& arrivaltime);
+             const std::chrono::time_point<Clock>& arrivaltime);
 
   /// read() must only be called from the reader thread, i.e. the thread that
   /// writes resampled output sound samples to the local sound card.
@@ -77,7 +85,8 @@ public:
   ///                    playbacktime is filtered by a delay-locked loop before it
   ///                    is used by the resampler.  arrivaltime is also used to
   ///                    detect dropouts on the playback side heuristically
-  void read(float* samples, const std::chrono::time_point& playbacktime);
+  template <class Clock>
+  void read(float* samples, const std::chrono::time_point<Clock>& playbacktime);
 
   /// A low-pass filtered indicator for the health of the adaptive resampling.
   /// Time constant is approximately 4 seconds.
@@ -85,7 +94,7 @@ public:
   ///             and no dropouts occur.
   /// @return 0.0 when 10% or more of the output samples cannot be computed
   ///             from input data due to late or lost packets or dropouts.
-  float get_health();
+  float get_health() const;
 
   /// Return number of late packages, i.e., packages which arrived,
   /// but were too late to be used in the buffer.
@@ -99,6 +108,9 @@ public:
 private:
   // dll stuff
   // ringbuffer stuff
+  unsigned channels;
+  unsigned writefragsize;
+  unsigned readfragsize;
   // resampler stuff
 };
 

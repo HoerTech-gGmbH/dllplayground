@@ -1,8 +1,10 @@
-all: lib
+all: lib unit-tests
 
 CXXFLAGS = -Wall -Wno-deprecated-declarations -std=c++17 -pthread	\
 -ggdb -fno-finite-math-only
-
+LDFLAGS = -L$(BUILD_DIR) -Lgoogletest/lib
+LDLIBS = -l$(LIB) -lgmock_main -lgmock -lgtest
+INCLUDEPATH = -I$(SOURCE_DIR) -Igoogletest/include
 OSFLAG :=
 ifeq ($(OS),Windows_NT)
 	OSFLAG += -D WIN32
@@ -35,13 +37,18 @@ endif
 
 VERSION=0.1
 
-OBJ = dll
+SOURCES = $(wildcard $(SOURCE_DIR)/*.cc)
+TEST_SOURCES = $(wildcard $(TEST_DIR)/*.cc)
+
+OBJ = $(patsubst $(SOURCE_DIR)/%.cc,%,$(SOURCES))
+TEST_OBJ = $(patsubst $(TEST_DIR)/%.cc,%,$(TEST_SOURCES))
 
 BUILD_OBJ = $(patsubst %,build/%.o,$(OBJ))
+TEST_BUILD_OBJ = $(patsubst %,build/%.o,$(TEST_OBJ))
 
 FULLVERSION=$(VERSION)
 
-CXXFLAGS += -DDLLVERSION="\"$(FULLVERSION)\"" $(OSFLAG)
+CXXFLAGS += -DDLLVERSION="\"$(FULLVERSION)\"" $(OSFLAG) $(INCLUDEPATH)
 
 ifeq "$(ARCH)" "x86_64"
 CXXFLAGS += -msse -msse2 -mfpmath=sse -ffast-math
@@ -50,24 +57,36 @@ endif
 CPPFLAGS = -std=c++17
 BUILD_DIR = build
 SOURCE_DIR = src
+TEST_DIR = test
+LIB = dll
 
-lib: build/libdll.a
+lib: build/lib$(LIB).a
 
-build/libdll.a: $(BUILD_OBJ)
+$(BUILD_DIR)/libdll.a: $(BUILD_OBJ)
 	ar rcs $@ $^
 
 %/.directory:
 	mkdir -p $*
 	touch $@
 
-build/%.o: src/%.cc $(wildcard src/*.h) build/.directory
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cc $(wildcard $(SOURCE_DIR)/*.h) build/.directory
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(BUILD_DIR)/%.o: $(TEST_DIR)/%.cc $(wildcard $(SOURCE_DIR)/*.h) build/.directory
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clangformat:
-	clang-format-9 -i $(wildcard src/*.cc) $(wildcard src/*.h)
+	clang-format-9 -i $(wildcard $(SOURCE_DIR)/*.cc)           \
+	$(wildcard $(SOURCE_DIR)/*.h) $(wildcard $(TEST_DIR)/*.cc) \
+	$(wildcard $(TEST_DIR)/*.h)
 
 clean:
-	rm -Rf build src/*~ googletest
+	rm -Rf $(BUILD_DIR) $(SOURCE_DIR)/*~ $(TEST_DIR)/*~ googletest
+
+unit-tests: $(BUILD_DIR)/unit-test-runner
+	$<
+
+$(BUILD_DIR)/unit-test-runner: googletest/lib/libgmock_main.a lib $(TEST_BUILD_OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $(TEST_BUILD_OBJ) $(LDFLAGS) $(LDLIBS)
 
 googletest: googletest/include/gmock/gmock.h googletest/lib/libgmock_main.a
 
