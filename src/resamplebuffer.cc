@@ -1,7 +1,7 @@
 #include "resamplebuffer.h"
 
 resamplebuffer_t::resamplebuffer_t
-(size_t channels, size_t writefragsize, size_t readfragsize,
+(uint64_t channels, uint64_t writefragsize, uint64_t readfragsize,
  double nominal_writer_rate_hz, double nominal_reader_rate_hz,
  double desireddelay_s, double expected_max_jitter_s,
  dll_cfg_t dllcfg, resampler_cfg_t resamplecfg)
@@ -13,21 +13,21 @@ resamplebuffer_t::resamplebuffer_t
 resamplebuffer_t::~resamplebuffer_t()
 {}
 
-size_t resamplebuffer_t::get_channels() const
+uint64_t resamplebuffer_t::get_channels() const
 { return channels; }
 
-size_t resamplebuffer_t::get_writefragsize() const
+uint64_t resamplebuffer_t::get_writefragsize() const
 { return writefragsize; }
-size_t resamplebuffer_t::get_readfragsize() const
+uint64_t resamplebuffer_t::get_readfragsize() const
 { return readfragsize; }
 
 float resamplebuffer_t::get_health() const
 { return 1.0f; }
 
-size_t resamplebuffer_t::get_num_late_packages() const
+uint64_t resamplebuffer_t::get_num_late_packages() const
 { return 0; }
 
-size_t resamplebuffer_t::get_num_lost_packages() const
+uint64_t resamplebuffer_t::get_num_lost_packages() const
 { return 0; }
 
 /*

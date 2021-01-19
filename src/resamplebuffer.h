@@ -1,7 +1,7 @@
 #ifndef RESAMPLEBUFFER_H
 #define RESAMPLEBUFFER_H
 
-#include <stddef.h> // for size_t
+#include <stdint.h> // for uint64_t
 #include <chrono>
 
 // preliminary type definitions
@@ -36,7 +36,7 @@ public:
   /// @param dllcfg        Configuration of the delay-locked loops used to smooth
   ///                      time stamps.
   /// @param resamplecfg   Configuration of the resampling.
-  resamplebuffer_t(size_t channels, size_t writefragsize, size_t readfragsize,
+  resamplebuffer_t(uint64_t channels, uint64_t writefragsize, uint64_t readfragsize,
                    double nominal_writer_rate_hz, double nominal_reader_rate_hz,
                    double desireddelay_s, double expected_max_jitter_s,
                    dll_cfg_t dllcfg, resampler_cfg_t resamplecfg);
@@ -45,20 +45,20 @@ public:
   ~resamplebuffer_t();
 
   /// @return Number of channels as specified in constructor.
-  size_t get_channels() const;
+  uint64_t get_channels() const;
 
   /// @return Number samples per channel for audio blocks written to the resampler.
-  size_t get_writefragsize() const;
+  uint64_t get_writefragsize() const;
 
   /// @return Number samples per channel for audio blocks read from the resampler.
-  size_t get_readfragsize() const;
+  uint64_t get_readfragsize() const;
 
   /// write() must only be called from the writer thread, i.e. the thread which
   /// receives audio data from the network.
   /// @param block_index Because network packets may be received out-of-order, 
   ///                    block_index contains the index of this audio block as
   ///                    it was sent from the sender.  Wrap-around because of
-  ///                    numeric overflow of data type size_t is supported.
+  ///                    numeric overflow of data type uint64_t is supported.
   /// @param samples     Pointer to buffer containing exactly
   ///                    get_channels()*get_writefragsize() audio samples. write()
   ///                    reads these samples and copies their values into an
@@ -70,7 +70,7 @@ public:
   ///                    the resampler.  Together with block_index, arrivaltime is
   ///                    used to detect dropouts on the sender's side heuristically
   template <class Clock>
-  void write(size_t block_index, const float* samples,
+  void write(uint64_t block_index, const float* samples,
              const std::chrono::time_point<Clock>& arrivaltime);
 
   /// read() must only be called from the reader thread, i.e. the thread that
@@ -99,12 +99,12 @@ public:
   /// Return number of late packages, i.e., packages which arrived,
   /// but were too late to be used in the buffer.
   /// @return number of late packages since instanciation
-  size_t get_num_late_packages() const;
+  uint64_t get_num_late_packages() const;
 
   /// Return number of lost packages, i.e., packages were presumably
   /// sent but never arrived.
   /// @return number of lost packages since instanciation
-  size_t get_num_lost_packages() const;
+  uint64_t get_num_lost_packages() const;
 private:
   // dll stuff
   // ringbuffer stuff
